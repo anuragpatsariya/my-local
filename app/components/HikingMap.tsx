@@ -40,8 +40,8 @@ export default function HikingMap({ hikingSpots }: HikingMapProps) {
         
         // Initialize map centered on San Francisco
         const map = new google.maps.Map(mapRef.current, {
-          center: { lat: 37.7749, lng: -122.4194 },
-          zoom: 12,
+          center: { lat: 37.3688, lng: -122.0363 },
+          zoom: 10,
           styles: [
             {
               featureType: 'poi',

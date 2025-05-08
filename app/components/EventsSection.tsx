@@ -1,15 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CalendarIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, TagIcon, CurrencyDollarIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
+import Image from 'next/image';
 
 interface Event {
   title: string;
   description: string;
   date: string;
   location: string;
+  address: string;
   url?: string;
+  imageUrl?: string;
+  price?: string;
+  category?: string;
 }
 
 export default function EventsSection() {
@@ -20,13 +25,16 @@ export default function EventsSection() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Note: You'll need to replace this with an actual events API
-        // For example, Eventbrite API or local events database
         const response = await fetch('/api/events');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch events');
+        }
         const data = await response.json();
         setEvents(data);
       } catch (error) {
-        setError('Failed to fetch events');
+        setError(error instanceof Error ? error.message : 'Failed to fetch events');
+        console.error('Error fetching events:', error);
       } finally {
         setLoading(false);
       }
@@ -67,15 +75,48 @@ export default function EventsSection() {
           events.map((event, index) => (
             <article key={index} className="border-b border-gray-100 pb-4 last:border-0">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-16 h-16 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <CalendarIcon className="h-8 w-8 text-blue-500" />
-                </div>
+                {event.imageUrl ? (
+                  <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden">
+                    <Image
+                      src={event.imageUrl}
+                      alt={event.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-shrink-0 w-16 h-16 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <CalendarIcon className="h-8 w-8 text-blue-500" />
+                  </div>
+                )}
                 <div className="flex-grow">
                   <h3 className="font-medium mb-1">{event.title}</h3>
                   <p className="text-sm text-gray-600 line-clamp-2">{event.description}</p>
-                  <div className="mt-2 text-sm text-gray-500">
+                  <div className="mt-2 text-sm text-gray-500 space-y-1">
                     <p>{format(new Date(event.date), 'MMM d, yyyy h:mm a')}</p>
-                    <p>{event.location}</p>
+                    <div className="flex items-start gap-1">
+                      <MapPinIcon className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium">{event.location}</p>
+                        {event.address && (
+                          <p className="text-gray-600">{event.address}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {event.category && (
+                        <div className="flex items-center gap-1">
+                          <TagIcon className="h-4 w-4" />
+                          <span>{event.category}</span>
+                        </div>
+                      )}
+                      {event.price && (
+                        <div className="flex items-center gap-1">
+                          <CurrencyDollarIcon className="h-4 w-4" />
+                          <span>{event.price}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   {event.url && (
                     <a

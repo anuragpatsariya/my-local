@@ -21,7 +21,7 @@ export async function GET() {
       throw new Error('Google Maps API key is not configured');
     }
 
-    const location = 'Hayward+CA'; // You might want to get this from query params
+    const location = 'Sunnyvale+CA'; // You might want to get this from query params
     const radius = 50000; // 50km radius
 
     // First, get the coordinates of the location
