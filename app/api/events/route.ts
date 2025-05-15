@@ -78,13 +78,18 @@ export async function GET() {
 
     // Fetch events from Eventbrite using the coordinates
     const response = await fetch(
-      `https://www.eventbriteapi.com/v3/events/search/?` +
+      `https://www.eventbriteapi.com/v3/events/search?` +
       `location.latitude=${coordinates.lat}&` +
       `location.longitude=${coordinates.lng}&` +
       `location.within=${radius}&` +
       `sort_by=${sortBy}&` +
-      `expand=${expand}&` +
-      `token=${API_KEY}`
+      `expand=${expand}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
     if (!response.ok) {
